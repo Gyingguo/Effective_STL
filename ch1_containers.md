@@ -1,5 +1,92 @@
 # Ch1: Containers
 
+## Item 1: Choose your containers with care
+
+standard STL sequence containers, standard STL sequence containter, nonstandard sequence containers, nonstandard associative containers...
+
+Contiguous-memory containers, Node-based containers.
+
+## Item 2: Beware the illusion of container-independent code
+
+It's unrealistic to write containter independent codes. Each container has its own expertise as well as APIs.
+
+If you really want to do, use encapsulation.
+
+## Item 3: Make copying cheap and correct for objects in containers
+
+When you store object in container, make sure the object can be copied correctly.
+
+In new standard, may be also moved!
+
+Afraid of the overhead? Use container of pointers.
+
+Still some headaches? Use contianer of smart pointers.
+
+## Item 4: Call empty istead of checking size() against zero
+
+Prefer to use empty instead of size.
+
+For list, size() function may be O(n) time.
+
+The reason is that if size is constant time, then some operations for list, such as splice need to be linear time.
+
+## Item 5: Prefer range member functions to their single-element counterparts
+
+```c++
+v1.assign(v2.begin(), v2.size()/2, v2.end());
+```
+
+Reasons to prefer range member functions:
+
+* It's generally less work to write the code using the range member functions.
+
+* Range member functions tend to lead to code that is clearer and more straightforward.
+
+Why not use copy
+
+```c++
+copy(data, data+numValues, inserter(v, v.begin()));
+```
+
+1. unnecessary function calls.
+
+2. cost of inefficiently moving the existing elements in v to their final post-insertion positions.
+
+3. unnecessary memory allocation.
+
+What range member functions we have?
+
+* Range construction
+
+* Range insertion
+
+* Range erasure
+
+* Rnage assignment
+
+## Item 6: Be alert for C++'s most vexing parse
+
+```c++
+ifstream dataFile("ints.dat");
+list<int> data(istream_iterator<int>(dataFile), istream_iterator<int>());  // define a function
+
+in f(double d);
+int f(double (d));  // same as above, the parens are ignored
+int f(double);  // the same
+```
+
+How to solve it?
+
+```c++
+// Option 1
+list<int> data((istream_iterator<int>(dataFile)), istream_iterator<int>());
+
+// Option 2
+istream_iterator<int> dataBegin(dataFile);
+istream_iterator<int> dataEnd;
+list<int> data(dataBegin, dataEnd);
+```
+
 ## Item 7: When using containers of newed pointers, remember to delete the pointers before the container is destroyed
 
 Remember to delete the pointers before container is destroyed.
