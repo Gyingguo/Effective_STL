@@ -2,7 +2,7 @@
 
 ## Item 1: Choose your containers with care
 
-standard STL sequence containers, standard STL sequence containter, nonstandard sequence containers, nonstandard associative containers...
+Standard STL sequence containers, standard STL associate containter, nonstandard sequence containers, nonstandard associative containers...
 
 Contiguous-memory containers, Node-based containers.
 
@@ -70,7 +70,7 @@ What range member functions we have?
 ifstream dataFile("ints.dat");
 list<int> data(istream_iterator<int>(dataFile), istream_iterator<int>());  // define a function
 
-in f(double d);
+int f(double d);
 int f(double (d));  // same as above, the parens are ignored
 int f(double);  // the same
 ```
@@ -172,6 +172,7 @@ for (AssocContainer<int>::iterator i = c.begin(); i != c.end();) {
         ++i;
 }
 ```
+postincrement-the-iterator-you-pass-to-erase technique.
 
 ### To do something inside the loop.
 
@@ -186,6 +187,7 @@ for (SeqContainer<int>::iterator i = c.begin(); i != c.end();) {
     else ++i;
 }
 ```
+The return value of erase is exactly what we need.
 
 ## Item 10: Be aware of allocator conventions and restrictions
 
@@ -200,7 +202,7 @@ class SpecialAllocator {...};
 typedef SpecialAllocator<Widget> SAW;
 
 list<Widget, SAW> L1;
-list<Widget, SAW> L2;
+list<Widget, SAW> L2;.
 L1.splice(L1.begin(), L2);
 ```
 
@@ -241,9 +243,14 @@ rebind to another type (T -> ListNode)
 ```c++
 
 template<typename T>
-struct rebind {
-    typedef allocator<U> othere;
-}
+class allocator {
+public:
+    template<typename U>
+    struct rebind {
+        typedef allocator<U> other;
+    };
+    ...
+};
 
 Allocator::rebind<ListNode>::other   // represent ListNode
 ```
@@ -267,6 +274,8 @@ More to read:
 
 1. http://www.josuttis.com/cppcode/allocator.html
 
+    A very allocator example. Use allocate() to allocate memory and construct() to construct object upon it. Use operator new and placement new respectively.
+
 2. http://www.drdobbs.com/the-standard-librarian-what-are-allocato/184403759
 
 ## Item 11: Understand the legitimate uses of custom allocators
@@ -279,6 +288,7 @@ Or you'd like to set up a unique heap that corresponds to shared memory.
 You neeed custom allocator.
 
 ```c++
+// special routines you have to allcoate memory
 void* mallocShared(size_t bytesNeeded);
 void freeShared(void* ptr);
 
@@ -289,7 +299,7 @@ public:
     pointer allocate(size_type numObjects, const void* localityHint = 0) {
         return static_cast<pointer>(mallocShared(numObjects*sizeof(T)));
     }
-    void deallocate(pointer pt)rToMemory, size_type numObjects) {
+    void deallocate(pointer ptrToMemory, size_type numObjects) {
         freeShared(ptrToMemory);
     }
 };
